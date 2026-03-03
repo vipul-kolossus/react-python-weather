@@ -4,7 +4,7 @@ import WeatherCard from './components/WeatherCard';
 import WeatherCharts from './components/WeatherCharts';
 import SummaryStats from './components/SummaryStats';
 
-const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+const API_BASE = process.env.REACT_APP_API_URL ?? '';
 
 function App() {
   const [weather, setWeather] = useState([]);

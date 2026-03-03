@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from pathlib import Path
 import random
 from datetime import datetime
 import os
@@ -67,6 +68,16 @@ def health():
     return {"status": "ok"}
 
 
-# Serve React frontend (must come after all API routes)
-if os.path.exists("build"):
-    app.mount("/", StaticFiles(directory="build", html=True), name="static")
+BUILD_DIR = Path("build")
+
+# Serve React static assets (JS, CSS, media)
+if BUILD_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(BUILD_DIR / "static")), name="static-assets")
+
+# Catch-all: serve index.html for any path not matched above (SPA routing)
+@app.get("/{full_path:path}")
+async def serve_frontend(full_path: str):
+    index = BUILD_DIR / "index.html"
+    if index.exists():
+        return FileResponse(str(index))
+    return {"error": "Frontend not built"}
